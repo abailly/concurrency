@@ -1,0 +1,1 @@
+Implementation of concurrency constructs from [The Art of Multiprocessor Programming](http://www.elsevierdirect.com/v2/companion.jsp?ISBN=9780123705914).
