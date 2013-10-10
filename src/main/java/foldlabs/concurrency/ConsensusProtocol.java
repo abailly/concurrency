@@ -19,6 +19,6 @@ public abstract class ConsensusProtocol<T> implements Consensus<T> {
     }
     
     protected void propose(T value) {
-        proposals[Threads.id()] = value;
+        proposals[Threads.id() % proposals.length] = value;
     }
 }

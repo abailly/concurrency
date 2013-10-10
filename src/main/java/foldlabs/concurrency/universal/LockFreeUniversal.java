@@ -43,7 +43,7 @@ public class LockFreeUniversal<S extends Invokable> implements Invokable {
 
     @Override
     public Response apply(Request request) {
-        int id = Threads.id();
+        int id = Threads.id() % numberOfThreads;
         Node prefer = new Node(request, numberOfThreads);
 
         while (prefer.getSequence() == 0) {

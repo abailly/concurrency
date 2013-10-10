@@ -31,7 +31,7 @@ public class CASConsensus<T> extends ConsensusProtocol<T> {
     @Override
     public T decide(T proposal) {
         propose(proposal);
-        int id = Threads.id();
+        int id = Threads.id() % proposals.length;
         if (decider.compareAndSet(FIRST, id)) {
             return proposals[id];
         }

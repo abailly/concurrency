@@ -15,7 +15,7 @@ public class LockFreeUniversalTest {
     private static final Method poll = Reflections.findMethod(ArrayDeque.class, "poll");
 
     private static final int NUMBER_OF_THREADS = 10;
-    public static final int NUMBER_INSERTED = 100_000;
+    public static final int NUMBER_INSERTED = 10_000;
 
     @Test
     public void is_identical_to_sequential_execution_when_accessed_through_a_single_thread() throws Exception {
@@ -75,6 +75,7 @@ public class LockFreeUniversalTest {
 
         assertThat(results).containsOnly(range(0, NUMBER_INSERTED));
     }
+
 
     private Integer poll(Invokable invokable) {
         return (Integer) invokable.apply(new Invokable.Request(poll, new Object[0])).result;
