@@ -1,8 +1,10 @@
 package foldlabs.concurrency.lock;
 
+import foldlabs.concurrency.util.Range;
 import foldlabs.concurrency.util.Threads;
 import org.junit.Test;
 
+import java.io.*;
 import java.util.Random;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -11,9 +13,10 @@ public class BakeryLockTest {
 
     long counts = 0;
     private final Random random = new Random();
-    
+
     @Test
     public void ensures_mutual_exclusion_between_multiple_threads() throws Exception {
+        final PrintWriter writer = new PrintWriter(new FileWriter("test"));
 
         final BakeryLock lock = new BakeryLock(10);
 
@@ -29,13 +32,13 @@ public class BakeryLockTest {
                         // counts are not guaranteed to respect sequential consistency: The code is not data-race free
                         // as threads read and write same variable without enforcing order
                         // 
-                        // note this defeats the whole point of the BakeryLock as far as memory access is concerned! 
-                        // this restricts its use to mutex sections with side-effects?
-                        synchronized (BakeryLockTest.this) {
-                            for (long j = 0; j < 100_000_000L; j++) {
-                                counts++;
-                            }
+                        // note this defeats the whole point of the BakeryLock as far as memory access is concerned as
+                        // we would need to put this code inside a synchronized() section, hence we use a side-effect to
+                        // ensure we can observe mutual exclusion
+                        for (long j = 1_000 * finalI; j < 1_000 * (finalI + 1); j++) {
+                            writer.println(j);
                         }
+                        writer.flush();
                     } finally {
                         lock.unlock();
                     }
@@ -47,6 +50,21 @@ public class BakeryLockTest {
 
         threads.join();
 
-        assertThat(counts).isEqualTo(1_000_000_000L);
+        writer.close();
+
+        int[] result = readNumbers();
+
+        assertThat(result).containsOnly(new Range().range(0, 10_000));
+    }
+
+    private int[] readNumbers() throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader("test"));
+        String line;
+        int[] result = new int[10_000];
+        int i = 0;
+        while ((line = reader.readLine()) != null) {
+            result[i++] = Integer.parseInt(line);
+        }
+        return result;
     }
 }

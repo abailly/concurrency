@@ -1,5 +1,6 @@
 package foldlabs.concurrency.universal;
 
+import foldlabs.concurrency.util.Range;
 import foldlabs.concurrency.util.Reflections;
 import foldlabs.concurrency.util.Threads;
 import org.junit.Test;
@@ -16,6 +17,8 @@ public class LockFreeUniversalTest {
 
     private static final int NUMBER_OF_THREADS = 10;
     public static final int NUMBER_INSERTED = 10_000;
+    
+    private Range range = new Range();
 
     @Test
     public void is_identical_to_sequential_execution_when_accessed_through_a_single_thread() throws Exception {
@@ -32,7 +35,7 @@ public class LockFreeUniversalTest {
             results[i] = poll(invokable);
         }
 
-        assertThat(results).isEqualTo(range(0, 1000));
+        assertThat(results).isEqualTo(range.range(0, 1000));
 
         LockFreeUniversal universal = new LockFreeUniversal(1, new QueueAsInvokableFactory<Integer>());
 
@@ -44,7 +47,7 @@ public class LockFreeUniversalTest {
             results[i] = poll(universal);
         }
 
-        assertThat(results).isEqualTo(range(0, 1000));
+        assertThat(results).isEqualTo(range.range(0, 1000));
     }
 
     @Test
@@ -73,7 +76,7 @@ public class LockFreeUniversalTest {
             results[i] = poll(universal);
         }
 
-        assertThat(results).containsOnly(range(0, NUMBER_INSERTED));
+        assertThat(results).containsOnly(range.range(0, NUMBER_INSERTED));
     }
 
 
@@ -85,13 +88,6 @@ public class LockFreeUniversalTest {
         invokable.apply(new Invokable.Request(add, new Object[]{i}));
     }
 
-    private int[] range(int from, int to) {
-        int[] range = new int[to - from];
-        for (int i = 0; i < to - from; i++) {
-            range[i] = i + from;
-        }
-        return range;
-    }
 
     private static class QueueAsInvokableFactory<T> implements InvokableFactory<QueueAsInvokable<T>> {
         @Override
