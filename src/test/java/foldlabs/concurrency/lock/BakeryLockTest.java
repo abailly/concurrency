@@ -5,14 +5,10 @@ import foldlabs.concurrency.util.Threads;
 import org.junit.Test;
 
 import java.io.*;
-import java.util.Random;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 public class BakeryLockTest {
-
-    long counts = 0;
-    private final Random random = new Random();
 
     @Test
     public void ensures_mutual_exclusion_between_multiple_threads() throws Exception {
